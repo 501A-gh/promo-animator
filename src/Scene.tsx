@@ -3,7 +3,7 @@ import { CameraHelper } from "./CameraHelper";
 
 export const Scene = () => {
   return (
-    <Canvas>
+    <Canvas className="border border-rose-500">
       <mesh>
         <boxGeometry args={[2, 2, 2]} />
         <meshPhongMaterial />
