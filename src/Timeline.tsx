@@ -22,9 +22,11 @@ const Scrubber: React.FC<React.ComponentProps<typeof SliderPrimitive.Root>> = ({
 
 export const Timeline: React.FC<{
   data: AnimationData;
+  isPlaying: boolean;
+  setTime: (value: number) => void;
   time: number;
-  onChange: (value: number) => void;
-}> = ({ data, time, onChange }) => {
+  setIsPlaying: (value: boolean) => void;
+}> = ({ data, time, isPlaying, setTime, setIsPlaying }) => {
   const { duration, keyframes } = data;
   return (
     <div className="flex flex-col relative">
@@ -32,7 +34,20 @@ export const Timeline: React.FC<{
         min={0}
         max={duration}
         value={[time]}
-        onValueChange={(value) => onChange(value[0])}
+        onValueChange={(value) => {
+          setTime(value[0]);
+          setIsPlaying(false); // Pause when scrubbing manually
+        }}
+        onKeyDown={(e) => {
+          if (e.code === "Space") {
+            e.preventDefault(); // Prevent page scrolling
+            if (time === duration) {
+              setTime(0);
+            } else {
+              setIsPlaying(!isPlaying); // Toggle play state
+            }
+          }
+        }}
       />
       <div className="flex items-center w-full">
         {keyframes.map((frame, index) => (

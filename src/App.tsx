@@ -10,24 +10,32 @@ import { Timeline } from "./Timeline";
 
 function App() {
   const data = animationData as AnimationData;
-  const { duration } = data;
-  const [time, setTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const { duration, keyframes } = data;
 
-  // Handler for slider changes (scrub through the timeline)
-  const handleSliderChange = (v: number) => {
-    setTime(v);
-    setIsPlaying(false); // Pause when scrubbing manually
+  const [time, setTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const skipToNextKeyframe = () => {
+    const nextKeyframeTime = keyframes.find((k) => k.time > time)?.time || 0;
+    setTime(nextKeyframeTime);
+  };
+
+  const skipToPreviousKeyframe = () => {
+    const previousKeyframeTime = keyframes.reduce(
+      (prev, curr) => (curr.time < time ? curr.time : prev),
+      0,
+    );
+    setTime(previousKeyframeTime);
   };
 
   return (
-    <>
-      <div>
-        <div className="grid grid-cols-2 h-fit border-b border-blue-400">
-          <div className="flex flex-col">
-            <div className="flex-1 flex justify-center items-center">
+    <div className="flex">
+      <div className="flex-1">
+        <div className="grid grid-cols-5 h-fit border-b border-zinc-800">
+          <div className="col-span-2 flex flex-col">
+            <div className="flex-1 flex justify-center items-center bg-gradient-to-t from-zinc-950 via-zinc-900 to-zinc-950">
               <Canvas
-                className="border border-rose-500 my-auto rounded-md"
+                className="my-auto"
                 style={{
                   aspectRatio: 16 / 9,
                   height: "fit-content",
@@ -46,16 +54,35 @@ function App() {
                 <gridHelper args={[20, 20, "#888888", "#444444"]} />
               </Canvas>
             </div>
-            <div className="flex justify-between items-center p-4 gap-3 text-black dark:text-white">
-              <button onClick={() => setTime(0)}>Reset</button>
-              <div className="flex items-center gap-3">
-                <button>Previous Keyframe</button>
-                <button>Next Keyframe</button>
+            <div className="flex justify-between items-center py-2 px-3 gap-3 text-black dark:text-white text-sm">
+              <div className="flex items-center gap-0.5">
+                <button
+                  onClick={() => {
+                    if (time === duration) setTime(0);
+                    setIsPlaying(!isPlaying);
+                  }}
+                >
+                  {isPlaying ? "Pause" : "Play"}
+                </button>
+                <button
+                  disabled={time === 0 || isPlaying}
+                  onClick={() => {
+                    setTime(0);
+                  }}
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="flex items-center gap-0.5">
+                <button onClick={() => skipToPreviousKeyframe()}>
+                  Previous
+                </button>
+                <button onClick={() => skipToNextKeyframe()}>Next</button>
               </div>
             </div>
           </div>
           <Canvas
-            className="border border-rose-500 w-full"
+            className="col-span-3 border-l border-zinc-800 w-full"
             style={{
               height: "500px",
             }}
@@ -81,21 +108,21 @@ function App() {
           </Canvas>
         </div>
         <div className="p-2">
-          <Timeline time={time} onChange={handleSliderChange} data={data} />
+          <Timeline
+            data={data}
+            time={time}
+            isPlaying={isPlaying}
+            setTime={setTime}
+            setIsPlaying={setIsPlaying}
+          />
         </div>
-        <button
-          onClick={() => {
-            if (time === duration) setTime(0);
-            setIsPlaying(!isPlaying);
-          }}
-        >
-          {isPlaying ? "Pause" : "Play"}
-        </button>
+
         <span className="font-mono">
           {Number(time).toFixed(2)}/{duration}
         </span>
       </div>
-    </>
+      <aside className="flex flex-col min-w-72 border-l border-zinc-800 h-screen"></aside>
+    </div>
   );
 }
 
