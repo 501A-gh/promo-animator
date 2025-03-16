@@ -6,6 +6,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Camera } from "./Camera";
 import { CameraHelper } from "./CameraHelper";
 import { Timeline } from "./Timeline";
+import { Button } from "./Button";
 // import { AnimatedBox } from "./AnimatedBox";
 
 function App() {
@@ -30,8 +31,8 @@ function App() {
 
   return (
     <div className="flex">
-      <div className="flex-1">
-        <div className="grid grid-cols-5 h-fit border-b border-zinc-800">
+      <div className="flex-1 flex flex-col">
+        <div className="grid grid-cols-5 h-fit border-b border-zinc-700">
           <div className="col-span-2 flex flex-col">
             <div className="flex-1 flex justify-center items-center bg-gradient-to-t from-zinc-950 via-zinc-900 to-zinc-950">
               <Canvas
@@ -54,30 +55,30 @@ function App() {
                 <gridHelper args={[20, 20, "#888888", "#444444"]} />
               </Canvas>
             </div>
-            <div className="flex justify-between items-center py-2 px-3 gap-3 text-black dark:text-white text-sm">
+            <div className="flex justify-between items-center p-2 gap-3 text-black dark:text-white text-sm">
               <div className="flex items-center gap-0.5">
-                <button
+                <Button
                   onClick={() => {
                     if (time === duration) setTime(0);
                     setIsPlaying(!isPlaying);
                   }}
                 >
                   {isPlaying ? "Pause" : "Play"}
-                </button>
-                <button
+                </Button>
+                <Button
                   disabled={time === 0 || isPlaying}
                   onClick={() => {
                     setTime(0);
                   }}
                 >
                   Reset
-                </button>
+                </Button>
               </div>
               <div className="flex items-center gap-0.5">
-                <button onClick={() => skipToPreviousKeyframe()}>
+                <Button onClick={() => skipToPreviousKeyframe()}>
                   Previous
-                </button>
-                <button onClick={() => skipToNextKeyframe()}>Next</button>
+                </Button>
+                <Button onClick={() => skipToNextKeyframe()}>Next</Button>
               </div>
             </div>
           </div>
@@ -107,7 +108,12 @@ function App() {
             <OrbitControls />
           </Canvas>
         </div>
-        <div className="p-2">
+        <footer className="bg-zinc-800 border-b border-zinc-700 py-2 px-3 text-sm flex items-center justify-center">
+          <span className="font-mono text-white">
+            {Number(time).toFixed(2)}/{duration}
+          </span>
+        </footer>
+        <div className="flex-1">
           <Timeline
             data={data}
             time={time}
@@ -116,12 +122,15 @@ function App() {
             setIsPlaying={setIsPlaying}
           />
         </div>
-
-        <span className="font-mono">
-          {Number(time).toFixed(2)}/{duration}
-        </span>
+        <footer className="bg-zinc-800 border-t border-zinc-700 py-2 px-3 text-sm">
+          <div>
+            <span className="font-mono text-white">
+              {Number(time).toFixed(2)}/{duration}
+            </span>
+          </div>
+        </footer>
       </div>
-      <aside className="flex flex-col min-w-72 border-l border-zinc-800 h-screen"></aside>
+      <aside className="flex flex-col min-w-72 border-l border-zinc-600 bg-zinc-700 h-screen"></aside>
     </div>
   );
 }

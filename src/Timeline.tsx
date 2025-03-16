@@ -2,20 +2,27 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { AnimationData } from "./types";
 import { cn } from "./lib/utils";
 
-const Scrubber: React.FC<React.ComponentProps<typeof SliderPrimitive.Root>> = ({
-  ...props
-}) => {
+const Scrubber: React.FC<
+  React.ComponentProps<typeof SliderPrimitive.Root> & { max: number }
+> = ({ ...props }) => {
   return (
     <SliderPrimitive.Root
       ref={props.ref}
       className="relative flex w-full touch-none select-none items-center"
       step={0.01}
+      style={{
+        background: `repeating-linear-gradient(90deg, #27272a, #27272a ${1 / props.max}%, transparent ${1 / props.max}%, transparent ${10 / props.max}%)`,
+      }}
       {...props}
     >
-      <SliderPrimitive.Track className="relative h-10 w-full grow overflow-hidden rounded-sm bg-zinc-800">
+      <SliderPrimitive.Track className="relative h-20 w-full grow overflow-hidden">
         <SliderPrimitive.Range className="absolute h-full bg-primary" />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className="block h-9 w-1 rounded-full cursor-ew-resize border-none bg-rose-700 shadow transition-colors outline-transparent outline-offset-2 outline-2 focus-visible:outline-zinc-600 focus-visible:ring-rose-700" />
+      <SliderPrimitive.Thumb className="h-20 w-0.5 flex bg-gradient-to-b from-rose-800 to-rose-600 justify-start rounded-xs border-none cursor-ew-resize outline-transparent outline-offset-1 outline-2 opacity-50 focus:opacity-100 bg-zinc-800 shadow shadow-rose-800">
+        {/* <button className="absolute -translate-x-1/2 translate-y-20 w-fit px-2 py-0.5 h-fit text-xs text-center rounded-full text-rose-700 font-mono font-semibold">
+          {Number(props.value).toFixed(2)}
+        </button> */}
+      </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>
   );
 };
@@ -49,16 +56,19 @@ export const Timeline: React.FC<{
           }
         }}
       />
-      <div className="flex items-center w-full">
+      <div className="flex items-center relative h-4 w-full">
         {keyframes.map((frame, index) => (
           <button
             key={index}
             className={cn(
-              "absolute h-8 w-0.5 grow overflow-hidden rounded-full bg-amber-500 -translate-y-5 cursor-pointer active:scale-95",
+              "absolute h-4 w-0.5 grow overflow-hidden rounded-full cursor-pointer border-none active:scale-95 transition-all",
+              time === frame.time
+                ? "bg-amber-500 translate-y-2 -translate-x-1/2 size-6"
+                : "bg-amber-700",
               frame.time / duration === 1 && "-translate-x-0.5",
             )}
             style={{ left: `${(frame.time / duration) * 100}%` }}
-            onClick={() => onChange(frame.time)}
+            onClick={() => setTime(frame.time)}
           />
         ))}
       </div>
