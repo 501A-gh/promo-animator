@@ -3,6 +3,6 @@
   "keyframes": [
     { "time": 0, "position": [0, 0, 0], "rotation": [0, 0, 0] },
     { "time": 2.5, "position": [2, 2, 0], "rotation": [0, 1.57, 0] },
-    { "time": 5, "position": [0, 4, 0], "rotation": [0, 3.14, 0] }
+    { "time": 5, "position": [0, 4, 0], "rotation": [0.5, 3.14, 0] }
   ]
 }

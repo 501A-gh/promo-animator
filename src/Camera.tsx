@@ -1,15 +1,40 @@
-import { useFrame, useThree } from "@react-three/fiber";
-import { Vector3 } from "three";
+import { useFrame } from "@react-three/fiber";
+import { AnimationData } from "./types";
+import { useRef } from "react";
+import { PerspectiveCamera } from "@react-three/drei";
+import { PerspectiveCamera as ThreePerspectiveCamera } from "three";
+import { getInterpolatedValues } from "./getInterpolatedValues";
 
-export const Camera = () => {
-  const { camera } = useThree();
-  const target = new Vector3(10, 10, 10); // Example target
+export const Camera: React.FC<{
+  data: AnimationData;
+  time: number;
+  isPlaying: boolean;
+  setTime: (time: number) => void;
+  setIsPlaying: (isPlaying: boolean) => void;
+}> = ({ data, time, isPlaying, setTime, setIsPlaying }) => {
+  const cameraRef = useRef<ThreePerspectiveCamera>(null);
+  const { keyframes, duration } = data;
 
-  useFrame(() => {
-    // Example: Move the camera towards a target
-    camera.position.lerp(target, 0.1); // Smoothly move towards the target
-    camera.lookAt(target); // Make the camera look at the target
+  useFrame((_, delta) => {
+    if (isPlaying) {
+      let newTime = time + delta;
+      if (newTime > duration) {
+        newTime = duration;
+        setIsPlaying(false);
+      }
+      setTime(newTime);
+    }
+
+    const { position, rotation } = getInterpolatedValues(time, keyframes);
+    if (cameraRef.current) {
+      cameraRef.current.position.set(...position);
+      cameraRef.current.rotation.set(...rotation);
+    }
   });
 
-  return null;
+  return (
+    <>
+      <PerspectiveCamera ref={cameraRef} makeDefault />
+    </>
+  );
 };
